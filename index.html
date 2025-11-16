@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROLIVE - Proyecto de Investigación</title>
+    
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración de colores personalizados y estilos -->
+    <style type="text/tailwindcss">
+        @layer base {
+            /* Fuente principal (Inter) */
+            html {
+                font-family: 'Inter', sans-serif;
+            }
+        }
+        @layer utilities {
+            /* Clases para el acordeón (Actividades) */
+            .accordion-trigger {
+                @apply w-full text-left px-6 py-4 bg-bg-light hover:bg-primary-dark/10 transition-all duration-300 flex justify-between items-center font-medium text-primary-dark rounded-md;
+            }
+            .accordion-content {
+                @apply max-h-0 overflow-hidden transition-all duration-500 ease-in-out;
+            }
+            .accordion-content.is-open {
+                @apply max-h-screen; /* O un valor lo suficientemente grande */
+            }
+            .accordion-icon {
+                @apply transition-transform duration-300;
+            }
+            .is-open .accordion-icon {
+                @apply rotate-180;
+            }
+
+            /* --- Estilos para el Consorcio (Popups) --- */
+            .consorcio-card {
+                @apply relative bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer transition-all duration-300;
+            }
+            .consorcio-card:hover {
+                @apply shadow-xl scale-[1.03];
+            }
+            .consorcio-popup {
+                @apply absolute z-20 left-1/2 -top-4 -translate-x-1/2 -translate-y-full w-72 p-4 bg-text-dark text-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-300 pointer-events-none;
+                /* Flecha */
+                clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 55% 90%, 50% 100%, 45% 90%, 0% 90%);
+            }
+            .consorcio-card:hover .consorcio-popup {
+                @apply opacity-100 visible -translate-y-[110%];
+            }
+
+            /* --- Estilos para la Timeline (Avances) --- */
+            /* Contenedor principal de la timeline */
+            .timeline-container::before {
+                content: '';
+                @apply absolute top-0 left-1/2 -translate-x-1/2 w-1 h-full bg-primary-dark/10 rounded-full hidden md:block;
+            }
+            /* El item de la timeline (cada bloque de actividad) */
+            .timeline-item {
+                @apply relative pl-8 md:pl-0 md:flex md:items-center md:justify-between;
+            }
+            /* El círculo en la línea */
+            .timeline-item::before {
+                content: '';
+                @apply absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-5 h-5 bg-primary-dark border-4 border-white rounded-full z-10 hidden md:block;
+            }
+            /* La tarjeta de contenido (texto) */
+            .timeline-content {
+                @apply relative z-0 md:w-[calc(50%-2.5rem)] bg-white p-6 rounded-lg shadow-lg border-t-4 border-primary-light transition-all duration-300;
+            }
+            .timeline-item:hover .timeline-content {
+                @apply shadow-xl scale-[1.03];
+            }
+            /* El contenedor de la imagen */
+            .timeline-image-container {
+                @apply hidden md:block md:w-[calc(50%-2.5rem)];
+            }
+            .timeline-image-container img {
+                @apply w-full h-auto object-cover rounded-lg shadow-lg transition-all duration-300;
+            }
+            .timeline-item:hover .timeline-image-container img {
+                @apply shadow-xl scale-[1.03];
+            }
+            /* Línea horizontal (móvil) */
+            .timeline-item::after {
+                content: '';
+                @apply absolute top-10 left-0 w-8 h-1 bg-primary-dark/20 block md:hidden;
+            }
+
+
+            /* --- Estilos para Objetivos (Hotspots) --- */
+            .objetivo-hotspot {
+                @apply w-24 h-24 rounded-full bg-bg-light border-4 border-primary-dark/30 flex items-center justify-center text-primary-dark cursor-pointer transition-all duration-300 relative;
+            }
+            .objetivo-hotspot:hover,
+            .objetivo-hotspot.is-active {
+                @apply border-primary-dark scale-110 shadow-xl;
+            }
+            .objetivo-hotspot span {
+                @apply font-semibold text-center text-sm;
+            }
+            /* Ocultar descripciones de objetivos por defecto */
+            .objetivo-descripcion {
+                @apply hidden;
+            }
+            .objetivo-descripcion.is-active {
+                @apply block;
+            }
+            
+            /* --- Estilos para Navegación Activa (Scrollspy) --- */
+            .nav-link-active {
+                @apply font-bold text-primary-dark;
+            }
+            .nav-button-active {
+                @apply ring-4 ring-primary-dark/50;
+            }
+
+            /* --- Estilos para Contadores de Impacto --- */
+            .impact-number {
+                @apply text-5xl font-bold text-primary-dark;
+            }
+            .impact-label {
+                @apply text-lg text-text-dark/80 mt-2;
+            }
+        }
+    </style>
+    
+    <script>
+        // Configuración de Tailwind para usar los colores personalizados
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#4a5c20', // Verde oliva oscuro (del banner)
+                        'primary-light': '#8a9a5b', // Verde oliva más claro
+                        'text-dark': '#3a3a3a',    // Gris carbón (del logo)
+                        'text-light': '#f8f7f2',   // Blanco-crema
+                        'bg-light': '#f8f7f2',     // Fondo crema claro
+                        'accent': '#d4a373',      // Acento dorado/marrón claro
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Iconos (para el menú móvil y más) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+<body class="bg-bg-light text-text-dark antialiased">
+
+    <!-- =========== HEADER / NAVEGACIÓN =========== -->
+    <header id="header" class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto max-w-7xl px-4 py-3 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#inicio" class="flex items-center">
+                <!-- REEMPLAZAR IMAGEN: Logo del proyecto -->
+                <img src="logo.png" alt="Logo PROLIVE" class="h-12 w-auto">
+            </a>
+
+            <!-- Navegación Desktop -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#inicio" class="nav-link text-text-dark hover:text-primary-dark font-medium transition-colors" data-navlink="inicio">Inicio</a>
+                <a href="#impacto" class="nav-link text-text-dark hover:text-primary-dark font-medium transition-colors" data-navlink="impacto">Impacto</a>
+                <a href="#proyecto" class="nav-link text-text-dark hover:text-primary-dark font-medium transition-colors" data-navlink="proyecto">El proyecto</a>
+                <a href="#consorcio" class="nav-link text-text-dark hover:text-primary-dark font-medium transition-colors" data-navlink="consorcio">El consorcio</a>
+                <a href="#avances" class="nav-link text-text-dark hover:text-primary-dark font-medium transition-colors" data-navlink="avances">Avances</a>
+                <a href="#noticias" class="nav-link text-text-dark hover:text-primary-dark font-medium transition-colors" data-navlink="noticias">Noticias</a>
+                <a href="#contacto" class="nav-button ml-4 bg-primary-dark text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:bg-primary-light transition-all" data-navlink="contacto">
+                    Contacto
+                </a>
+            </div>
+
+            <!-- Botón Menú Móvil -->
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-text-dark hover:bg-gray-100">
+                <i data-lucide="menu"></i>
+            </button>
+        </nav>
+
+        <!-- Menú Móvil (Oculto por defecto) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <a href="#inicio" class="nav-link block px-4 py-3 text-text-dark hover:bg-bg-light" data-navlink="inicio">Inicio</a>
+            <a href="#impacto" class="nav-link block px-4 py-3 text-text-dark hover:bg-bg-light" data-navlink="impacto">Impacto</a>
+            <a href="#proyecto" class="nav-link block px-4 py-3 text-text-dark hover:bg-bg-light" data-navlink="proyecto">El proyecto</a>
+            <a href="#consorcio" class="nav-link block px-4 py-3 text-text-dark hover:bg-bg-light" data-navlink="consorcio">El consorcio</a>
+            <a href="#avances" class="nav-link block px-4 py-3 text-text-dark hover:bg-bg-light" data-navlink="avances">Avances</a>
+            <a href="#noticias" class="nav-link block px-4 py-3 text-text-dark hover:bg-bg-light" data-navlink="noticias">Noticias</a>
+            <a href="#contacto" class="nav-button block w-max mx-4 my-3 bg-primary-dark text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:bg-primary-light transition-all" data-navlink="contacto">Contacto</a>
+        </div>
+    </header>
+
+    <!-- =========== CONTENIDO PRINCIPAL =========== -->
+    <main>
+
+        <!-- =========== INICIO (HERO) CON CARRUSEL =========== -->
+        <section id="inicio" class="h-[60vh] md:h-[75vh] relative overflow-hidden bg-text-dark section-spy">
+            <!-- Carousel Track -->
+            <div id="carousel-track" class="flex h-full transition-transform duration-700 ease-in-out">
+                <!-- Diapositivas (10) -->
+                <!-- REEMPLAZAR IMÁGENES: 10 imágenes para el carrusel -->
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/01-olivar-vista-aerea.jpg" alt="Vista aérea de un olivar" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div> <!-- Overlay -->
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/02-investigador-laboratorio.jpg" alt="Investigador en laboratorio" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/03-detalle-aceitunas.jpg" alt="Detalle de aceitunas en el olivo" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/04-campus-rabanales-uco.jpg" alt="Campus de Rabanales (UCO)" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/05-mejora-genetica.jpg" alt="Concepto de mejora genética y ADN" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/06-dron-sobre-olivar.jpg" alt="Dron volando sobre un olivar" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/07-analisis-aceite.jpg" alt="Análisis de calidad de aceite de oliva" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/08-olivo-detalle-hojas.jpg" alt="Detalle de hojas de olivo" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/09-reunion-consorcio.jpg" alt="Reunión del consorcio del proyecto" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                <div class="carousel-slide w-full flex-shrink-0 h-full relative">
+                    <img src="img/carousel/10-olivar-atardecer.jpg" alt="Olivar al atardecer" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+            </div>
+            
+            <!-- Contenido de Texto Superpuesto -->
+            <div class="absolute z-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white p-4 w-full max-w-4xl">
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-4" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.7);">
+                    PROLIVE
+                </h1>
+                <p class="text-xl md:text-2xl font-light mb-8">
+                    Soluciones digitales y biotecnológicas para mitigar la crisis del cambio climático y acelerar el proceso de mejora genética en olivicultura.
+                </p>
+                <div class="bg-white/20 backdrop-blur-sm inline-block px-6 py-3 rounded-full text-sm font-medium">
+                    Enero 2024 - Diciembre 2027 | Financiado por CDTI y AEI. Convocatoria TRANSMISIONES
+                </div>
+            </div>
+    
+            <!-- Controles del Carousel -->
+            <button id="carousel-prev" class="absolute z-30 top-1/2 -translate-y-1/2 left-4 p-2 bg-white/30 rounded-full text-white hover:bg-white/50 transition-all">
+                <i data-lucide="chevron-left"></i>
+            </button>
+            <button id="carousel-next" class="absolute z-30 top-1/2 -translate-y-1/2 right-4 p-2 bg-white/30 rounded-full text-white hover:bg-white/50 transition-all">
+                <i data-lucide="chevron-right"></i>
+            </button>
+    
+            <!-- Indicadores (Puntos) -->
+            <div id="carousel-dots" class="absolute z-30 bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
+                <!-- Los puntos se generarán con JS -->
+            </div>
+        </section>
+
+        <!-- =========== DATOS DE IMPACTO (SECCIÓN ACTUALIZADA) =========== -->
+        <section id="impacto" class="py-24 bg-white section-spy">
+            <div class="container mx-auto max-w-7xl px-4">
+                
+                <!-- Contadores Animados -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mb-16">
+                    <!-- Dato 1: Presupuesto -->
+                    <div class="flex flex-col items-center justify-start p-4">
+                        <i data-lucide="euro" class="w-12 h-12 text-primary-light mb-3"></i>
+                        <span id="count-budget" class="impact-number">0.0 M€</span>
+                        <span class="impact-label">Presupuesto</span>
+                    </div>
+                    <!-- Dato 2: Socios -->
+                    <div class="flex flex-col items-center justify-start p-4">
+                        <i data-lucide="users" class="w-12 h-12 text-primary-light mb-3"></i>
+                        <span id="count-partners" class="impact-number">0+</span>
+                        <span class="impact-label">Socios (Público-Privado)</span>
+                    </div>
+                    <!-- Dato 3: Actividades -->
+                    <div class="flex flex-col items-center justify-start p-4">
+                        <i data-lucide="clipboard-list" class="w-12 h-12 text-primary-light mb-3"></i>
+                        <span id="count-activities" class="impact-number">0</span>
+                        <span class="impact-label">Actividades Principales</span>
+                    </div>
+                    <!-- Dato 4: Duración -->
+                    <div class="flex flex-col items-center justify-start p-4">
+                        <i data-lucide="calendar-days" class="w-12 h-12 text-primary-light mb-3"></i>
+                        <span id="count-duration" class="impact-number">0</span>
+                        <span class="impact-label">Meses de Duración</span>
+                    </div>
+                </div>
+
+                <!-- Slogan y Resultados Destacados -->
+                <div class="text-center mb-16">
+                    <p class="text-2xl italic text-primary-dark max-w-4xl mx-auto mb-12">
+                        "Un proyecto estratégico para revolucionar la olivicultura mediante la digitalización y la biotecnología."
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left">
+                            <i data-lucide="database" class="w-10 h-10 text-primary-dark mb-3"></i>
+                            <h4 class="font-semibold text-lg text-text-dark">Lanzamiento de OliveMine</h4>
+                            <p class="text-text-dark/80 text-sm">Base de datos integrativa para gestionar información genómica y fenómica.</p>
+                        </div>
+                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left">
+                            <i data-lucide="area-chart" class="w-10 h-10 text-primary-dark mb-3"></i>
+                            <h4 class="font-semibold text-lg text-text-dark">Alta Correlación Digital</h4>
+                            <p class="text-text-dark/80 text-sm">Demostrada alta correlación (<i>R<sup>2</sup>&gt;0,8</i>) entre métodos digitales y mediciones tradicionales.</p>
+                        </div>
+                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left">
+                            <i data-lucide="binary" class="w-10 h-10 text-primary-dark mb-3"></i>
+                            <h4 class="font-semibold text-lg text-text-dark">Prototipo ODT Funcional</h4>
+                            <p class="text-text-dark/80 text-sm">Desarrollo de un prototipo de Gemelo Digital (ODT) capaz de simular escenarios.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline de Progreso Automático -->
+                <div>
+                    <h3 class="text-2xl font-semibold text-text-dark text-center mb-6">Progreso del Proyecto</h3>
+                    <div class="relative w-full bg-gray-200 rounded-full h-4">
+                        <!-- Barra de progreso -->
+                        <div id="progress-bar" class="bg-primary-light h-4 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        <!-- Marcador "Hoy" -->
+                        <div id="progress-today" class="absolute top-0 -translate-x-1/2 -mt-10" style="left: 0%">
+                            <div class="relative">
+                                <span class="block text-sm font-semibold bg-primary-dark text-white px-3 py-1 rounded-md shadow-lg">Hoy</span>
+                                <!-- Flecha del marcador -->
+                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-t-[8px] border-t-primary-dark border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-sm font-medium text-text-dark/80 mt-2">
+                        <span>Enero 2024</span>
+                        <span id="progress-percentage" class="font-bold text-primary-dark">0%</span>
+                        <span>Diciembre 2027</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========== EL PROYECTO (VIDEO AÑADIDO) =========== -->
+        <section id="proyecto" class="py-24 bg-bg-light section-spy">
+            <div class="container mx-auto max-w-7xl px-4">
+                
+                <div class="text-center mb-20"> <!-- Margen inferior aumentado -->
+                    <h2 class="text-4xl font-bold text-primary-dark mb-4">El Proyecto</h2>
+                    <p class="text-lg text-text-dark/80 max-w-3xl mx-auto mb-10"> <!-- Margen inferior añadido al párrafo -->
+                        El proyecto PROLIVE busca proporcionar soluciones avanzadas para abordar los principales retos de la olivicultura en el siglo XXI.
+                    </p>
+
+                    <!-- Video de YouTube añadido -->
+                    <div class="max-w-4xl mx-auto aspect-video rounded-lg overflow-hidden shadow-lg">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            src="https://www.youtube-nocookie.com/embed/ybT_3V_twHY?origin=http://localhost" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- --- Objetivos (NUEVO DISEÑO INTERACTIVO) --- -->
+                <div id="objetivos" class="mb-20">
+                    <h3 class="text-3xl font-semibold text-text-dark mb-10 text-center">Nuestros Objetivos</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                        <!-- Columna de Hotspots (Círculos) -->
+                        <div class="md:col-span-1 flex flex-row md:flex-col justify-center items-center gap-6 p-4">
+                            <div class="flex md:flex-row gap-6">
+                                <div class="objetivo-hotspot is-active" data-objetivo="1">
+                                    <span>Genética</span>
+                                </div>
+                                <div class="objetivo-hotspot" data-objetivo="2">
+                                    <span>Digital</span>
+                                </div>
+                            </div>
+                            <div class="objetivo-hotspot" data-objetivo="3">
+                                <span>Gemelo Digital</span>
+                            </div>
+                            <div class="flex md:flex-row gap-6">
+                                <div class="objetivo-hotspot" data-objetivo="4">
+                                    <span>Clima</span>
+                                </div>
+                                <div class="objetivo-hotspot" data-objetivo="5">
+                                    <span>Calidad</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna de Descripción -->
+                        <div class="md:col-span-2 p-6 bg-white rounded-lg shadow-inner min-h-[300px] flex items-center relative">
+                            <!-- Flecha decorativa -->
+                            <div class="absolute left-0 top-1/2 -translate-x-full w-0 h-0 border-t-[20px] border-t-transparent border-b-[20px] border-b-transparent border-r-[20px] border-r-white hidden md:block"></div>
+                            
+                            <div id="objetivos-descripcion-container">
+                                <!-- Descripciones (JS las mostrará/ocultará) -->
+                                <div class="objetivo-descripcion is-active" data-objetivo="1">
+                                    <h4 class="text-2xl font-semibold text-primary-dark mb-3">Secuenciación Genética</h4>
+                                    <p class="text-text-dark/90 text-lg">
+                                        Desarrollo de marcadores genéticos y una base de datos integrativa para la selección de biomarcadores y la identificación rápida de variedades.
+                                    </p>
+                                </div>
+                                <div class="objetivo-descripcion" data-objetivo="2">
+                                    <h4 class="text-2xl font-semibold text-primary-dark mb-3">Herramientas Digitales</h4>
+                                    <p class="text-text-dark/90 text-lg">
+                                        Implantación de herramientas para la evaluación y selección rápida de nuevas variedades de olivo y la gestión de explotaciones.
+                                    </p>
+                                </div>
+                                <div class="objetivo-descripcion" data-objetivo="3">
+                                    <h4 class="text-2xl font-semibold text-primary-dark mb-3">Gemelo Digital (ODT)</h4>
+                                    <p class="text-text-dark/90 text-lg">
+                                        Concepción, diseño e implementación de un gemelo digital para zonas de experimentación y su expansión en explotaciones comerciales.
+                                    </p>
+                                </div>
+                                <div class="objetivo-descripcion" data-objetivo="4">
+                                    <h4 class="text-2xl font-semibold text-primary-dark mb-3">Adaptación Climática</h4>
+                                    <p class="text-text-dark/90 text-lg">
+                                        Desarrollo de acciones de adaptación al cambio climático y a enfermedades emergentes en olivicultura.
+                                    </sA.5.p>
+                                </div>
+                                <div class="objetivo-descripcion" data-objetivo="5">
+                                    <h4 class="text-2xl font-semibold text-primary-dark mb-3">Calidad del AOVE</h4>
+                                    <p class="text-text-dark/90 text-lg">
+                                        Realización de análisis fisicoquímicos para predecir la vida útil y calidad nutricional, y desarrollo de ingredientes funcionales.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- --- Actividades (NUEVO DISEÑO ACORDEÓN) --- -->
+                <div id="actividades" class="mb-20">
+                    <h3 class="text-3xl font-semibold text-text-dark mb-10 text-center">Actividades (Paquetes de Trabajo)</h3>
+                    <div id="accordion-container" class="space-y-3">
+                        
+                        <!-- Item Acordeón 1 -->
+                        <div>
+                            <button class="accordion-trigger" data-accordion-trigger="1">
+                                <span><strong>A.1.</strong> Selección Genómica y Desarrollo de Biomarcadores</span>
+                                <i data-lucide="chevron-down" class="accordion-icon"></i>
+                            </button>
+                            <div class="accordion-content" data-accordion-content="1">
+                                <div class="p-6 bg-white border border-t-0 border-gray-200 rounded-b-md">
+                                    <p><strong>Líder:</strong> BSC</p>
+                                    <p><strong>Participantes:</strong> UCO, SCI, UGR, Biotechvana</p>
+                                    <p class="mt-2 text-text-dark/80">Construcción de un pan-genoma de referencia, secuenciación masiva (WGS) del Banco de Germoplasma y desarrollo de la base de datos OliveMine.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Acordeón 2 -->
+                        <div>
+                            <button class="accordion-trigger" data-accordion-trigger="2">
+                                <span><strong>A.2.</strong> Digitalización en Fenotipado y Selección</span>
+                                <i data-lucide="chevron-down" class="accordion-icon"></i>
+                            </button>
+                            <div class="accordion-content" data-accordion-content="2">
+                                <div class="p-6 bg-white border border-t-0 border-gray-200 rounded-b-md">
+                                    <p><strong>Líder:</strong> CSIC-IAS</p>
+                                    <p><strong>Participantes:</strong> IAS, UCO, PC, SCI, TODOLIVO, DRIMAY</p>
+                                    <p class="mt-2 text-text-dark/80">Uso de sensores LiDAR y drones para medir la arquitectura de la planta, digitalizar la caracterización agronómica y fenotipar la tolerancia a la sequía.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Acordeón 3 -->
+                        <div>
+                            <button class="accordion-trigger" data-accordion-trigger="3">
+                                <span><strong>A.3.</strong> Gemelo Digital de Explotaciones (ODT)</span>
+                                <i data-lucide="chevron-down" class="accordion-icon"></i>
+                            </button>
+                            <div class="accordion-content" data-accordion-content="3">
+                                <div class="p-6 bg-white border border-t-0 border-gray-200 rounded-b-md">
+                                    <p><strong>Líder:</strong> DRIMAY</p>
+                                    <p><strong>Participantes:</strong> UCO, IAS, SCI, PC</p>
+                                    <p class="mt-2 text-text-dark/80">Diseño de la estructura del ODT, creación de una ontología del olivar, y desarrollo de modelos de predicción y Machine Learning (LAML).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Acordeón 4 -->
+                        <div>
+                            <button class="accordion-trigger" data-accordion-trigger="4">
+                                <span><strong>A.4.</strong> Acciones Biotecnológicas (Clima y Enfermedades)</span>
+                                <i data-lucide="chevron-down" class="accordion-icon"></i>
+                            </button>
+                            <div class="accordion-content" data-accordion-content="4">
+                                <div class="p-6 bg-white border border-t-0 border-gray-200 rounded-b-md">
+                                    <p><strong>Líder:</strong> FERTINYECT</p>
+                                    <p><strong>Participantes:</strong> UCO, IAS, TODOLIVO, P. CONTINENTAL, UGR, DRIMAY</p>
+                                    <p class="mt-2 text-text-dark/80">Establecimiento de observatorios climáticos, predicción de riesgos por patógenos, ensayos de resistencia a enfermedades y adaptación de la endoterapia al olivar.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Acordeón 5 -->
+                        <div>
+                            <button class="accordion-trigger" data-accordion-trigger="5">
+                                <span><strong>A.5.</strong> Nutrición y Calidad Alimentaria en Aceite de Oliva</span>
+                                <i data-lucide="chevron-down" class="accordion-icon"></i>
+                            </button>
+                            <div class="accordion-content" data-accordion-content="5">
+                                <div class="p-6 bg-white border border-t-0 border-gray-200 rounded-b-md">
+                                    <p><strong>Líder:</strong> INDLAB</p>
+                                    <p><strong>Participantes:</strong> UCO, TODOLIVO, SCI, PLANTAS CONTINENTAL</p>
+                                    <p class="mt-2 text-text-dark/80">Selección de nuevas variedades de alta calidad nutricional, desarrollo de ingredientes funcionales fenólicos y creación de un modelo predictivo de vida útil del aceite.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- --- Resultados (por Plazo) --- -->
+                <div id="resultados">
+                    <h3 class="text-3xl font-semibold text-text-dark mb-10 text-center">Resultados (por Plazo)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-accent transition-all duration-300 hover:shadow-xl hover:scale-[1.03]">
+                            <h4 class="text-xl font-semibold text-accent mb-2">Corto Plazo (TRL 4-6)</h4>
+                            <p class="text-text-dark/90">
+                                <strong>Digitalización, Gemelo Digital y selección de variedades.</strong> Generación y caracterización rápida y efectiva de nuevas variedades.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-accent transition-all duration-300 hover:shadow-xl hover:scale-[1.03]">
+                            <h4 class="text-xl font-semibold text-accent mb-2">Medio Plazo (TRL 3-5)</h4>
+                            <p class="text-text-dark/90">
+                                <strong>Biotecnología.</strong> Secuenciación genómica y desarrollo de biomarcadores para acelerar la mejora genética frente a los retos de cambio climático.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-accent transition-all duration-300 hover:shadow-xl hover:scale-[1.03]">
+                            <h4 class="text-xl font-semibold text-accent mb-2">Medio Plazo (TRL 2-5)</h4>
+                            <p class="text-text-dark/90">
+                                <strong>Reducción de pesticidas y necesidades hídricas.</strong> Inducción de la resistencia a enfermedades por métodos naturales.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-accent transition-all duration-300 hover:shadow-xl hover:scale-[1.03]">
+                            <h4 class="text-xl font-semibold text-accent mb-2">Largo Plazo (TRL 2-4)</h4>
+                            <p class="text-text-dark/90">
+                                <strong>Nutrición y calidad alimentaria.</strong> Obtención de aceites de alta calidad nutricional y desarrollo de modelos predictivos de la vida útil del AOVE.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========== EL CONSORCIO (NUEVO DISEÑO INTERACTIVO) =========== -->
+        <section id="consorcio" class="py-24 bg-white section-spy">
+            <div class="container mx-auto max-w-7xl px-4">
+                
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-primary-dark mb-4">El Consorcio</h2>
+                    <p class="text-lg text-text-dark/80 max-w-3xl mx-auto">
+                        Coordinado por la <strong>Universidad de Córdoba (UCO)</strong>, el proyecto cuenta con un presupuesto total de <strong>6.407.820,55 €</strong> y está formado por un sólido grupo de entidades públicas y empresas líderes.
+                    </p>
+                </div>
+
+                <!-- --- Parrilla de Socios --- -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    
+                    <!-- Columna Entidades Públicas -->
+                    <div>
+                        <h3 class="text-3xl font-semibold text-text-dark mb-6 border-b-2 border-primary-light pb-2">
+                            Entidades Públicas
+                        </h3>
+                        <span class="text-sm font-semibold text-text-dark/70">(Presupuesto: 3.282.199,55 €)</span>
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+                            <!-- UCO -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Universidad de Córdoba (UCO)</strong>
+                                <div class="consorcio-popup">
+                                    <strong>UCO:</strong> Lidera el proyecto el grupo UCOLIVO (Recursos Genéticos, Protección y Mejora del Olivo), gestor del Banco Mundial de Germoplasma del Olivo de Córdoba.
+                                </div>
+                            </div>
+                            <!-- CSIC-IAS -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">CSIC-IAS</strong>
+                                <div class="consorcio-popup">
+                                    <strong>CSIC-IAS:</strong> El Instituto de Agricultura Sostenible es un centro de referencia en ciencias agrarias. Participa el laboratorio AgroPhenoLab, experto en fenotipado masivo.
+                                </div>
+                            </div>
+                            <!-- UGR -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Universidad de Granada (UGR)</strong>
+                                <div class="consorcio-popup">
+                                    <strong>UGR:</strong> Institución puntera en investigación, situada en el top 10 de universidades españolas y reconocida en el ranking Shanghai Top 500.
+                                </div>
+                            </div>
+                            <!-- BSC-CNS -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Barcelona Supercomputing Centre (BSC-CNS)</strong>
+                                <div class="consorcio-popup">
+                                    <strong>BSC-CNS:</strong> Experiencia en análisis genómico poblacional. Coordinó el proyecto del primer genoma de referencia del olivo.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Empresas -->
+                    <div>
+                        <h3 class="text-3xl font-semibold text-text-dark mb-6 border-b-2 border-primary-light pb-2">
+                            Empresas
+                        </h3>
+                        <span class="text-sm font-semibold text-text-dark/70">(Presupuesto: 3.125.621,00 €)</span>
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+                            <!-- Todolivo -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Todolivo</strong>
+                                <div class="consorcio-popup">
+                                    <strong>Todolivo:</strong> Empresa especializada en olivicultura, pionera en olivar superintensivo. Ha obtenido 72 nuevas variedades a través de su Programa de Mejora Genética.
+                                </div>
+                            </div>
+                            <!-- Drimay -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Drimay</strong>
+                                <div class="consorcio-popup">
+                                    <strong>Drimay:</strong> Expertos en sistemas de información y analítica de datos, especialmente con algoritmos de sistemas complejos y "small data" para investigación sanitaria y agroalimentaria.
+                                </div>
+                            </div>
+                            <!-- Plantas Continental -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Plantas Continental (PC)</strong>
+                                <div class="consorcio-popup">
+                                    <strong>Plantas Continental:</strong> Homologada como Productor Seleccionador de Planta Certificada de Olivo. Única empresa en España que realiza toda su producción bajo esta homologación.
+                                </div>
+                            </div>
+                            <!-- SCI-OLIVE -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Santa Cruz Ingeniería (SCI-OLIVE)</strong>
+                                <div class="consorcio-popup">
+                                    <strong>SCI-OLIVE:</strong> Empresa de ingeniería y consultoría con foco en agricultura innovadora y sostenible. Posee una patente para la obtención de oleocantal.
+                                </div>
+                            </div>
+                            <!-- Indlab -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Indlab</strong>
+                                <div class="consorcio-popup">
+                                    <strong>Indlab:</strong> Uno de los tres laboratorios de referencia mundial en el control de calidad, pureza y seguridad de los aceites vegetales.
+                                </div>
+                            </div>
+                            <!-- Fertinyect -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Fertinyect</strong>
+                                <div class="consorcio-popup">
+                                    <strong>Fertinyect:</strong> Ofrece soluciones sostenibles (control de plagas, fertilización) basadas en técnicas de endoterapia de desarrollo propio.
+                                </div>
+                            </div>
+                            <!-- Biotechvana -->
+                            <div class="consorcio-card">
+                                <strong class="text-primary-dark text-lg">Biotechvana</strong>
+                                <div class="consorcio-popup">
+                                    <strong>Biotechvana:</strong> Especializada en Bioinformática y Biología Computacional. Desarrolla software, pipelines y bases de datos para análisis genómico.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Galería de Logos de Socios (MODIFICADO: Sin grayscale, más grandes, con sombra) -->
+                <div class="mt-20">
+                    <h4 class="text-2xl font-semibold text-text-dark mb-8 text-center">Nuestros Socios</h4>
+                    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+                        <!-- REEMPLAZAR IMÁGENES: Logos de los socios -->
+                        <img src="img/logo-socios/logo_uco.png" alt="Logo Universidad de Córdoba" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_todolivo.png" alt="Logo Todolivo" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_csic_ias.png" alt="Logo CSIC-IAS" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_drimay.png" alt="Logo Drimay" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_ugr.png" alt="Logo UGR" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_plantas_continental.png" alt="Logo Plantas Continental" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_bsc.png" alt="Logo BSC" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_sci_olive.png" alt="Logo SCI-OLIVE" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_indlab.png" alt="Logo Indlab" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_fertinyect.png" alt="Logo Fertinyect" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                        <img src="img/logo-socios/logo_biotechvana.png" alt="Logo Biotechvana" class="h-20 w-auto opacity-90 hover:opacity-100 transform transition-all duration-300 hover:scale-110 hover:shadow-lg">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========== AVANCES Y RESULTADOS (NUEVO DISEÑO TIMELINE) =========== -->
+        <section id="avances" class="py-24 bg-bg-light section-spy">
+            <div class="container mx-auto max-w-7xl px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-primary-dark mb-4">Avances y Resultados</h2>
+                    <p class="text-lg text-text-dark/80 max-w-3xl mx-auto">
+                        Resultados destacados reportados hasta Diciembre 2024.
+                    </p>
+                </div>
+
+                <!-- Contenedor de la Línea de Tiempo (MODIFICADO) -->
+                <div class="timeline-container relative flex flex-col gap-12">
+                    
+                    <!-- Item 1 (Texto Derecha, Imagen Izquierda) -->
+                    <div class="timeline-item relative md:flex md:items-center md:justify-between">
+                        <!-- Imagen (Escritorio) -->
+                        <div class="timeline-image-container">
+                            <img src="img/avances/avance-genetica.jpg" alt="Visualización de ADN">
+                        </div>
+                        <!-- Contenido Texto (Derecha) -->
+                        <div class="timeline-content">
+                            <h3 class="text-2xl font-semibold text-primary-dark mb-3">Actividad 1: Construcción del Pan-genoma</h3>
+                            <ul class="list-disc list-inside space-y-2 text-text-dark/90">
+                                <li><strong>Secuenciación exitosa</strong> de 200 muestras de ADN.</li>
+                                <li>Construcción del <strong>pan-genoma de referencia</strong>.</li>
+                                <li>Desarrollo del <i>pipeline</i> <strong>PerSVade</strong>.</li>
+                                <li>Lanzamiento exitoso de la base de datos <strong>OliveMine</strong>.</li>
+                            </ul>
+                            <!-- Imagen (Móvil) -->
+                            <img src="img/avances/avance-genetica.jpg" alt="Visualización de ADN" class="w-full h-auto object-cover rounded-lg shadow-sm mt-4 md:hidden">
+                        </div>
+                    </div>
+
+                    <!-- Item 2 (Texto Izquierda, Imagen Derecha) -->
+                    <div class="timeline-item relative md:flex md:items-center md:justify-between">
+                        <!-- Contenido Texto (Izquierda) -->
+                        <div class="timeline-content md:text-right">
+                            <h3 class="text-2xl font-semibold text-primary-dark mb-3">Actividad 2: Digitalización del fenotipado</h3>
+                            <ul class="list-disc list-inside space-y-2 text-text-dark/90">
+                                <li>Demostrada <strong>alta correlación (<i>R<sup>2</sup>&gt;0,8</i>)</strong>.</li>
+                                <li>Protocolos de <strong>evaluación automatizada</strong> (drones/LiDAR).</li>
+                                <li>Realización de más de <strong>2000 injertos</strong>.</li>
+                                <li>Evaluación de más de <strong>500 genotipos</strong>.</li>
+                                <li>Identificación de variedades con <strong>tolerancia al estrés hídrico</strong>.</li>
+                            </ul>
+                            <!-- Imagen (Móvil) -->
+                            <img src="img/avances/avance-dron.jpg" alt="Dron sobrevolando olivar" class="w-full h-auto object-cover rounded-lg shadow-sm mt-4 md:hidden">
+                        </div>
+                        <!-- Imagen (Escritorio) -->
+                        <div class="timeline-image-container">
+                            <img src="img/avances/avance-dron.jpg" alt="Dron sobrevolando olivar">
+                        </div>
+                    </div>
+
+                    <!-- Item 3 (Texto Derecha, Imagen Izquierda) -->
+                    <div class="timeline-item relative md:flex md:items-center md:justify-between">
+                        <!-- Imagen (Escritorio) -->
+                        <div class="timeline-image-container">
+                            <img src="img/avances/avance-digital-twin.jpg" alt="Gráficos de Gemelo Digital">
+                        </div>
+                        <!-- Contenido Texto (Derecha) -->
+                        <div class="timeline-content">
+                            <h3 class="text-2xl font-semibold text-primary-dark mb-3">Actividad 3: Desarrollo del Olive Digital Twin (ODT)</h3>
+                            <ul class="list-disc list-inside space-y-2 text-text-dark/90">
+                                <li>Definición de la <strong>estructura conceptual del ODT</strong>.</li>
+                                <li>Creación de una <strong>ontología específica</strong>.</li>
+                                <li><strong>Validación preliminar</strong> de modelos matemáticos.</li>
+                                <li>Desarrollo de un <strong>prototipo funcional del ODT</strong>.</li>
+                            </ul>
+                            <!-- Imagen (Móvil) -->
+                            <img src="img/avances/avance-digital-twin.jpg" alt="Gráficos de Gemelo Digital" class="w-full h-auto object-cover rounded-lg shadow-sm mt-4 md:hidden">
+                        </div>
+                    </div>
+
+                    <!-- Item 4 (Texto Izquierda, Imagen Derecha) -->
+                    <div class="timeline-item relative md:flex md:items-center md:justify-between">
+                        <!-- Contenido Texto (Izquierda) -->
+                        <div class="timeline-content md:text-right">
+                            <h3 class="text-2xl font-semibold text-primary-dark mb-3">Actividad 4: Adaptación varietal y climática</h3>
+                            <ul class="list-disc list-inside space-y-2 text-text-dark/90">
+                                <li>Establecimiento de <strong>múltiples observatorios climáticos</strong> (España, Portugal, Francia, etc.).</li>
+                                <li>Recopilación extensa de <strong>datos agronómicos</strong>.</li>
+                                <li>Análisis del <strong>rendimiento bajo condiciones extremas</strong>.</li>
+                                <li>Generación de información sobre <strong>adaptación climática</strong>.</li>
+                            </ul>
+                            <!-- Imagen (Móvil) -->
+                            <img src="img/avances/avance-clima.jpg" alt="Estación meteorológica en campo" class="w-full h-auto object-cover rounded-lg shadow-sm mt-4 md:hidden">
+                        </div>
+                        <!-- Imagen (Escritorio) -->
+                        <div class="timeline-image-container">
+                            <img src="img/avances/avance-clima.jpg" alt="Estación meteorológica en campo">
+                        </div>
+                    </div>
+
+                    <!-- Item 5 (Texto Derecha, Imagen Izquierda) -->
+                    <div class="timeline-item relative md:flex md:items-center md:justify-between">
+                        <!-- Imagen (Escritorio) -->
+                        <div class="timeline-image-container">
+                            <img src="img/avances/avance-aceite.jpg" alt="Análisis de aceite en laboratorio">
+                        </div>
+                        <!-- Contenido Texto (Derecha) -->
+                        <div class="timeline-content">
+                            <h3 class="text-2xl font-semibold text-primary-dark mb-3">Actividad 5: Nutrición y Calidad (En progreso)</h3>
+                            <ul class="list-disc list-inside space-y-2 text-text-dark/90">
+                                <li><strong>T5.1:</strong> Selección de nuevas variedades de alta calidad nutricional.</li>
+                                <li><strong>T5.2:</strong> Desarrollo de ingredientes funcionales fenólicos.</li>
+                                <li><strong>T5.3:</strong> Creación de un modelo predictivo de vida útil y etiquetado inteligente.</li>
+                            </ul>
+                            <!-- Imagen (Móvil) -->
+                            <img src="img/avances/avance-aceite.jpg" alt="Análisis de aceite en laboratorio" class="w-full h-auto object-cover rounded-lg shadow-sm mt-4 md:hidden">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =========== NOTICIAS (NUEVO DISEÑO DE BLOQUES) =========== -->
+        <section id="noticias" class="py-24 bg-white section-spy">
+            <div class="container mx-auto max-w-7xl px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-primary-dark mb-4">Noticias</h2>
+                    <p class="text-lg text-text-dark/80">
+                        Mantente al día con las últimas novedades y apariciones en medios del proyecto PROLIVE.
+                    </p>
+                </div>
+                
+                <!-- Parrilla de Noticias -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Noticia 1 -->
+                    <a href="https://www.diariocordoba.com/agricultura-medio-ambiente/2025/09/26/todolivo-avanza-proyecto-prolive-universidad-121802210.html" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        Septiembre 2025
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="newspaper" class="w-4 h-4 mr-1.5"></i>
+                                        Diario Córdoba
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Todolivo avanza en el proyecto Prolive con la Universidad de Córdoba</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    Todolivo continúa desarrollando el proyecto Prolive en colaboración con la Universidad de Córdoba. Este proyecto se centra en soluciones digitales y biotecnológicas, así como en la mejora genética del olivo para enfrentar el cambio climático.
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+                    
+                    <!-- Noticia 2 -->
+                    <a href="https://www.uco.es/servicios/actualidad/noticiasactualidaddia/item/154446-banco-germoplasma-bsc" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        4 de abril de 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="school-2" class="w-4 h-4 mr-1.5"></i>
+                                        UCO
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">La UCO se alía con el Barcelona Supercomputing Center</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    En el marco del proyecto PROLIVE, la UCO se alía con el BSC para secuenciar el genoma de todas las variedades del Banco de Germoplasma Mundial de Olivo, sentando las bases para la selección genómica de nuevas variedades.
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 3 -->
+                    <a href="https://ecomercioagrario.com/proyecto-prolive-innovacion-al-servicio-de-la-mejora-genetica-del-olivar/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        7 de marzo de 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="newspaper" class="w-4 h-4 mr-1.5"></i>
+                                        eComercio Agrario
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Lanzamiento oficial del Proyecto PROLIVE</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    Se profundiza en el objetivo del proyecto PROLIVE de adaptar el cultivo del olivar al cambio climático a través de la innovación científica y tecnológica. Es una collaboration público-privada con 11 socios y un presupuesto de más de 6,4 millones.
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 4 -->
+                    <a href="https://diariodelcampo.com/nace-el-proyecto-prolive-para-mejorar-geneticamente-el-olivar-y-adaptarlo-al-cambio-climatico/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        5 de marzo de 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="newspaper" class="w-4 h-4 mr-1.5"></i>
+                                        Diario del Campo
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Diario del Campo: Nace el proyecto PROLIVE</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    Se anuncia el nacimiento del proyecto PROLIVE, que busca desarrollar soluciones digitales y biotecnológicas para mitigar la crisis del cambio climático. Liderado por el grupo Ucolivo de la UCO y Todolivo, cuenta con 11 socios.
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 5 -->
+                    <a href="https://www.uco.es/servicios/actualidad/noticiasactualidaddia/item/154041-proyecto-prolive-olivar" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        4 de marzo de 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="school-2" class="w-4 h-4 mr-1.5"></i>
+                                        UCO
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">UCO - Innovación al servicio de la mejora genética del olivar</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    El proyecto PROLIVE, liderado por el grupo Ucolivo de la UCO y la empresa Todolivo, fue lanzado con el objetivo de adaptar el olivar a los desafíos del cambio climático, incluyendo la secuenciación genómica del Banco de Germoplasma.
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 6 -->
+                    <a href="https://www.todolivo.com/arranca-prolive/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        Diciembre 2023
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="building" class="w-4 h-4 mr-1.5"></i>
+                                        Todolivo
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Todolivo: Arranca PROLIVE</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    PROLIVE es un gran proyecto de innovación de 6,4 millones de euros, liderado por la UCO y Todolivo. Su objetivo principal es desarrollar soluciones digitales y biotecnológicas para la mejora genética del olivo.
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- =========== CONTACTO (MAPA ACTUALIZADO) =========== -->
+        <section id="contacto" class="py-24 bg-bg-light section-spy">
+            <div class="container mx-auto max-w-7xl px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-primary-dark mb-4">Contacto</h2>
+                    <p class="text-lg text-text-dark/80">
+                        Ponte en contacto con nosotros para más información.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    
+                    <!-- Columna de Información y Formulario -->
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold text-text-dark mb-4">Visítanos</h3>
+                        <address class="not-italic text-text-dark/90 mb-6 space-y-2">
+                            <p>Grupo de Investigación UCOLIVO (AGR 157) Universidad de Córdoba (UCO)</p>
+                            <p>Edificio Celestino Mutis (C4)</p>
+                            <p>Campus de Rabanales</p>
+                            <p>14014 Córdoba, España</p>
+                            <p class="font-semibold pt-2">Email: <a href="mailto:hmiho@uco.es" class="text-primary-dark hover:underline">hmiho@uco.es</a></p>
+                        </address>
+
+                        <h3 class="text-2xl font-semibold text-text-dark mb-4 mt-10">Envíanos un mensaje</h3>
+                        <!-- Formulario de contacto simple -->
+                        <form action="mailto:hmiho@uco.es" method="post" enctype="text/plain" class="space-y-4">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-text-dark/90">Nombre</label>
+                                <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 bg-bg-light border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-text-dark/90">Email</label>
+                                <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 bg-bg-light border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light">
+                            </div>
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-text-dark/90">Mensaje</label>
+                                <textarea id="message" name="message" rows="5" required class="mt-1 block w-full px-3 py-2 bg-bg-light border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light"></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full bg-primary-dark text-white px-6 py-3 rounded-full font-semibold shadow-md hover:bg-primary-light transition-all">
+                                    Enviar Mensaje
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Columna del Mapa (MAPA REAL) -->
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold text-text-dark mb-4">Nuestra Ubicación</h3>
+                        <!-- Mapa de Google Maps Embebido -->
+                        <iframe 
+                            src="https://maps.google.com/maps?q=37.913778,-4.717583&z=15&output=embed" 
+                            width="100%" 
+                            height="450" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="rounded-lg shadow-md aspect-video w-full">
+                        </iframe>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========== FOOTER =========== -->
+    <footer class="bg-text-dark text-text-light/70 py-16">
+        <div class="container mx-auto max-w-7xl px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                
+                <!-- Columna 1: Logo y Info -->
+                <div>
+                    <!-- REEMPLAZAR IMAGEN: Logo en versión clara si es necesario, o el mismo -->
+                    <img src="logo.png" alt="Logo PROLIVE" class="h-14 mb-4 grayscale invert brightness-200">
+                    <p class="mb-2"><strong>PROLIVE</strong> es un proyecto de investigación coordinado por la Universidad de Córdoba (UCO).</p>
+                    <p>&copy; 2024-2027 PROLIVE. Todos los derechos reservados.</p>
+                </div>
+
+                <!-- Columna 2: Financiación -->
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Financiado por</h4>
+                    <div class="flex items-center space-x-6">
+                        <!-- REEMPLAZAR IMÁGENES: Logos de las agencias de financiación -->
+                        <img src="img/logo-cdti.png" alt="Logo CDTI" class="h-12 w-auto">
+                        <img src="img/logo-aei.png" alt="Logo Agencia Estatal de Investigación" class="h-12 w-auto">
+                    </div>
+                </div>
+
+                <!-- Columna 3: Créditos y Links -->
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Enlaces</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#proyecto" class="hover:text-white transition-colors">El Proyecto</a></li>
+                        <li><a href="#consorcio" class="hover:text-white transition-colors">El Consorcio</a></li>
+                        <li><a href="#noticias" class="hover:text-white transition-colors">Noticias</a></li>
+                        <li><a href="#contacto" class="hover:text-white transition-colors">Contacto</a></li>
+                    </ul>
+                    <p class="mt-6 text-sm text-text-light/50">
+                        Página web construida por ALFANET.SL
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script para el menú móvil, carousel y nuevas interacciones -->
+    <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+
+        // Lógica del menú móvil
+        const menuBtn = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // --- Lógica del Carousel (Hero) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('carousel-track');
+            if (track) {
+                const slides = Array.from(track.children);
+                const nextButton = document.getElementById('carousel-next');
+                const prevButton = document.getElementById('carousel-prev');
+                const dotsContainer = document.getElementById('carousel-dots');
+                const totalSlides = slides.length;
+                let currentSlide = 0;
+                let autoplayInterval;
+
+                // 1. Crear Puntos Indicadores
+                if (dotsContainer) {
+                    slides.forEach((slide, index) => {
+                        const dot = document.createElement('button');
+                        dot.classList.add('carousel-dot', 'w-3', 'h-3', 'bg-white/50', 'rounded-full', 'transition-all', 'duration-300');
+                        if (index === 0) dot.classList.add('bg-white', 'scale-125');
+                        
+                        dot.addEventListener('click', () => {
+                            goToSlide(index);
+                            resetAutoplay();
+                        });
+                        dotsContainer.appendChild(dot);
+                    });
+                }
+                
+                const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
+
+                // 2. Función para mover a una diapositiva
+                const goToSlide = (slideIndex) => {
+                    if (slideIndex < 0) slideIndex = totalSlides - 1;
+                    if (slideIndex >= totalSlides) slideIndex = 0;
+
+                    track.style.transform = `translateX(-${slideIndex * 100}%)`;
+                    
+                    if (dots.length > 0) {
+                        dots[currentSlide].classList.remove('bg-white', 'scale-125');
+                        dots[slideIndex].classList.add('bg-white', 'scale-125');
+                    }
+                    
+                    currentSlide = slideIndex;
+                };
+
+                // 3. Event Listeners para botones
+                if (nextButton && prevButton) {
+                    nextButton.addEventListener('click', () => {
+                        goToSlide(currentSlide + 1);
+                        resetAutoplay();
+                    });
+                    prevButton.addEventListener('click', () => {
+                        goToSlide(currentSlide - 1);
+                        resetAutoplay();
+                    });
+                }
+
+                // 4. Autoplay
+                const startAutoplay = () => {
+                    autoplayInterval = setInterval(() => {
+                        goToSlide(currentSlide + 1);
+                    }, 5000); // Cambia cada 5 segundos
+                };
+                const resetAutoplay = () => {
+                    clearInterval(autoplayInterval);
+                    startAutoplay();
+                };
+                startAutoplay();
+            }
+
+            // --- Lógica de Objetivos (Hotspots) ---
+            const hotspots = document.querySelectorAll('.objetivo-hotspot');
+            const descripciones = document.querySelectorAll('.objetivo-descripcion');
+            
+            hotspots.forEach(hotspot => {
+                hotspot.addEventListener('mouseenter', () => {
+                    const objetivoId = hotspot.getAttribute('data-objetivo');
+                    
+                    // Quitar 'is-active' de todos
+                    hotspots.forEach(h => h.classList.remove('is-active'));
+                    descripciones.forEach(d => d.classList.remove('is-active'));
+                    
+                    // Añadir 'is-active' al actual
+                    hotspot.classList.add('is-active');
+                    document.querySelector(`.objetivo-descripcion[data-objetivo="${objetivoId}"]`).classList.add('is-active');
+                });
+            });
+
+            // --- Lógica del Acordeón (Actividades) ---
+            const accordionContainer = document.getElementById('accordion-container');
+            if (accordionContainer) {
+                const triggers = accordionContainer.querySelectorAll('[data-accordion-trigger]');
+                
+                triggers.forEach(trigger => {
+                    trigger.addEventListener('click', () => {
+                        const contentId = trigger.getAttribute('data-accordion-trigger');
+                        const content = accordionContainer.querySelector(`[data-accordion-content="${contentId}"]`);
+                        const isOpen = content.classList.contains('is-open');
+
+                        // Cerrar todos los demás
+                        accordionContainer.querySelectorAll('.accordion-content.is-open').forEach(openContent => {
+                            if (openContent !== content) {
+                                openContent.classList.remove('is-open');
+                                openContent.style.maxHeight = '0px';
+                                const otherTrigger = accordionContainer.querySelector(`[data-accordion-trigger="${openContent.getAttribute('data-accordion-content')}"]`);
+                                otherTrigger.parentElement.classList.remove('is-open');
+                            }
+                        });
+
+                        // Abrir/Cerrar el actual
+                        if (isOpen) {
+                            content.classList.remove('is-open');
+                            content.style.maxHeight = '0px';
+                            trigger.parentElement.classList.remove('is-open');
+                        } else {
+                            content.classList.add('is-open');
+                            content.style.maxHeight = content.scrollHeight + 'px'; // Ajustar a altura
+                            trigger.parentElement.classList.add('is-open');
+                        }
+                    });
+                });
+            }
+
+            // --- Lógica de Contadores (Impacto) - CORREGIDA ---
+            const countersData = [
+                { id: 'count-budget', end: 6.4, decimals: 1, suffix: ' M€' },
+                { id: 'count-partners', end: 11, decimals: 0, suffix: '+' },
+                { id: 'count-activities', end: 5, decimals: 0, suffix: '' },
+                { id: 'count-duration', end: 48, decimals: 0, suffix: '' }
+            ];
+            
+            const speed = 200; // Velocidad de la animación
+
+            const animateCounter = (counter) => {
+                const targetEl = document.getElementById(counter.id);
+                if (!targetEl) return;
+
+                const end = counter.end;
+                const decimals = counter.decimals;
+                const suffix = counter.suffix || '';
+                let current = 0; // Iniciar siempre desde 0
+                
+                const increment = end / speed;
+
+                const updateCount = () => {
+                    if (current < end) {
+                        current += increment;
+                        if (current > end) current = end;
+                        targetEl.innerText = current.toFixed(decimals) + suffix;
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        targetEl.innerText = end.toFixed(decimals) + suffix;
+                    }
+                };
+                
+                // Reiniciar el texto a 0 antes de animar
+                targetEl.innerText = (0).toFixed(decimals) + suffix;
+                updateCount();
+            };
+
+            const impactSection = document.getElementById('impacto');
+            let hasAnimatedCounters = false;
+            
+            const counterObserver = new IntersectionObserver((entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting && !hasAnimatedCounters) {
+                    countersData.forEach(animateCounter);
+                    hasAnimatedCounters = true; // Solo animar una vez
+                    // No descomentar la siguiente línea si quieres que se re-anime cada vez que entras
+                    // counterObserver.unobserve(impactSection); 
+                } else if (!entry.isIntersecting) {
+                    // Opcional: Resetear la animación si la sección sale de la vista
+                    // hasAnimatedCounters = false;
+                }
+            }, { threshold: 0.5 }); // Se activa al 50% de visibilidad
+
+            if (impactSection) {
+                counterObserver.observe(impactSection);
+            }
+
+            // --- Lógica de la Barra de Progreso (Impacto) ---
+            const startDate = new Date('2024-01-01');
+            const endDate = new Date('2027-12-31');
+            const today = new Date();
+            
+            const totalDuration = endDate.getTime() - startDate.getTime();
+            const elapsedDuration = today.getTime() - startDate.getTime();
+            
+            let progress = (elapsedDuration / totalDuration) * 100;
+            
+            // Limitar progreso entre 0% y 100%
+            if (progress < 0) progress = 0;
+            if (progress > 100) progress = 100;
+
+            const progressBar = document.getElementById('progress-bar');
+            const progressToday = document.getElementById('progress-today');
+            const progressPercentage = document.getElementById('progress-percentage');
+
+            if (progressBar && progressToday && progressPercentage) {
+                // Aplicar con un ligero retraso para ver la animación
+                setTimeout(() => {
+                    progressBar.style.width = `${progress}%`;
+                    progressToday.style.left = `${progress}%`;
+                    progressPercentage.innerText = `${progress.toFixed(1)}%`;
+                }, 500);
+            }
+
+
+            // --- Lógica de Navegación Activa (Scrollspy) - CORREGIDA ---
+            const sections = document.querySelectorAll('.section-spy');
+            const header = document.getElementById('header');
+            const allNavLinks = document.querySelectorAll('.nav-link, .nav-button');
+            const mobileMenuEl = document.getElementById('mobile-menu');
+
+            // 1. Función para poner el enlace como activo
+            const setActiveLink = (id) => {
+                allNavLinks.forEach(link => {
+                    const linkId = link.getAttribute('data-navlink');
+                    
+                    // Para enlaces de texto
+                    if (link.classList.contains('nav-link')) {
+                        link.classList.toggle('nav-link-active', linkId === id);
+                    }
+                    
+                    // Para botones
+                    if (link.classList.contains('nav-button')) {
+                        link.classList.toggle('nav-button-active', linkId === id);
+                    }
+                });
+            };
+
+            // 2. Observador (para scroll)
+            const observerOptions = {
+                root: null,
+                rootMargin: `-${(header ? header.offsetHeight : 70) + 20}px 0px 0px 0px`, // Offset por cabecera + 20px
+                threshold: 0.3 // 30% de la sección visible
+            };
+
+            const scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        setActiveLink(id);
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                scrollObserver.observe(section);
+            });
+
+            // 3. Event Listener (para clics)
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const id = link.getAttribute('data-navlink');
+                    setActiveLink(id); // Activa el enlace inmediatamente
+
+                    // Cierra el menú móvil si está abierto
+                    if (mobileMenuEl && !mobileMenuEl.classList.contains('hidden')) {
+                        mobileMenuEl.classList.add('hidden');
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
