@@ -89,13 +89,13 @@
             }
 
 
-            /* --- Estilos para Objetivos (Hotspots) --- */
+            /* --- Estilos para Objetivos (Hotspots) - MEJORADO --- */
             .objetivo-hotspot {
-                @apply w-24 h-24 rounded-full bg-bg-light border-4 border-primary-dark/30 flex items-center justify-center text-primary-dark cursor-pointer transition-all duration-300 relative;
+                @apply w-24 h-24 rounded-full border-4 border-accent bg-accent/20 flex items-center justify-center text-primary-dark cursor-pointer transition-all duration-300 relative shadow-md;
             }
             .objetivo-hotspot:hover,
             .objetivo-hotspot.is-active {
-                @apply border-primary-dark scale-110 shadow-xl;
+                @apply border-primary-dark scale-110 shadow-xl bg-accent;
             }
             .objetivo-hotspot span {
                 @apply font-semibold text-center text-sm;
@@ -136,7 +136,7 @@
                         'primary-light': '#8a9a5b', // Verde oliva más claro
                         'text-dark': '#3a3a3a',    // Gris carbón (del logo)
                         'text-light': '#f8f7f2',   // Blanco-crema
-                        'bg-light': '#f8f7f2',     // Fondo crema claro
+                        'bg-light': '#f2f0e6',     // Fondo crema claro (MÁS OSCURO)
                         'accent': '#d4a373',      // Acento dorado/marrón claro
                     }
                 }
@@ -150,9 +150,9 @@
 </head>
 <body class="bg-bg-light text-text-dark antialiased">
 
-    <!-- =========== HEADER / NAVEGACIÓN =========== -->
-    <header id="header" class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <nav class="container mx-auto max-w-7xl px-4 py-3 flex justify-between items-center">
+    <!-- =========== HEADER / NAVEGACIÓN (MODIFICADO: FIXED) =========== -->
+    <header id="header" class="bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm h-16">
+        <nav class="container mx-auto max-w-7xl px-4 py-3 flex justify-between items-center h-full">
             <!-- Logo -->
             <a href="#inicio" class="flex items-center">
                 <!-- REEMPLAZAR IMAGEN: Logo del proyecto -->
@@ -190,8 +190,8 @@
         </div>
     </header>
 
-    <!-- =========== CONTENIDO PRINCIPAL =========== -->
-    <main>
+    <!-- =========== CONTENIDO PRINCIPAL (MODIFICADO: MARGEN SUPERIOR) =========== -->
+    <main class="mt-16">
 
         <!-- =========== INICIO (HERO) CON CARRUSEL =========== -->
         <section id="inicio" class="h-[60vh] md:h-[75vh] relative overflow-hidden bg-text-dark section-spy">
@@ -374,30 +374,27 @@
                     </div>
                 </div>
 
-                <!-- --- Objetivos (NUEVO DISEÑO INTERACTIVO) --- -->
+                <!-- --- Objetivos (NUEVO DISEÑO INTERACTIVO Y RESPONSIVO) --- -->
                 <div id="objetivos" class="mb-20">
                     <h3 class="text-3xl font-semibold text-text-dark mb-10 text-center">Nuestros Objetivos</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                        <!-- Columna de Hotspots (Círculos) -->
-                        <div class="md:col-span-1 flex flex-row md:flex-col justify-center items-center gap-6 p-4">
-                            <div class="flex md:flex-row gap-6">
-                                <div class="objetivo-hotspot is-active" data-objetivo="1">
-                                    <span>Genética</span>
-                                </div>
-                                <div class="objetivo-hotspot" data-objetivo="2">
-                                    <span>Digital</span>
-                                </div>
+                        
+                        <!-- Columna de Hotspots (Círculos) - MEJORADO RESPONSIVO -->
+                        <div class="md:col-span-1 flex flex-wrap justify-center items-center gap-6 p-4">
+                            <div class="objetivo-hotspot is-active" data-objetivo="1">
+                                <span>Genética</span>
+                            </div>
+                            <div class="objetivo-hotspot" data-objetivo="2">
+                                <span>Digital</span>
                             </div>
                             <div class="objetivo-hotspot" data-objetivo="3">
                                 <span>Gemelo Digital</span>
                             </div>
-                            <div class="flex md:flex-row gap-6">
-                                <div class="objetivo-hotspot" data-objetivo="4">
-                                    <span>Clima</span>
-                                </div>
-                                <div class="objetivo-hotspot" data-objetivo="5">
-                                    <span>Calidad</span>
-                                </div>
+                            <div class="objetivo-hotspot" data-objetivo="4">
+                                <span>Clima</span>
+                            </div>
+                            <div class="objetivo-hotspot" data-objetivo="5">
+                                <span>Calidad</span>
                             </div>
                         </div>
 
@@ -417,7 +414,7 @@
                                 <div class="objetivo-descripcion" data-objetivo="2">
                                     <h4 class="text-2xl font-semibold text-primary-dark mb-3">Herramientas Digitales</h4>
                                     <p class="text-text-dark/90 text-lg">
-                                        Implantación de herramientas para la evaluación y selección rápida de nuevas variedades de olivo y la gestión de explotaciones.
+                                        Implantación de herramientas para la evaluación y selección rápida de nuevas varieties de olivo y la gestión de explotaciones.
                                     </p>
                                 </div>
                                 <div class="objetivo-descripcion" data-objetivo="3">
@@ -817,7 +814,7 @@
         </section>
 
 
-        <!-- =========== NOTICIAS (NUEVO DISEÑO DE BLOQUES) =========== -->
+        <!-- =========== NOTICIAS (MODIFICADO: Contenido actualizado) =========== -->
         <section id="noticias" class="py-24 bg-white section-spy">
             <div class="container mx-auto max-w-7xl px-4">
                 <div class="text-center mb-16">
@@ -827,7 +824,7 @@
                     </p>
                 </div>
                 
-                <!-- Parrilla de Noticias -->
+                <!-- Parrilla de Noticias (CONTENIDO ACTUALIZADO) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     
                     <!-- Noticia 1 -->
@@ -846,7 +843,7 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Todolivo avanza en el proyecto Prolive con la Universidad de Córdoba</h3>
                                 <p class="text-text-dark/80 text-sm line-clamp-4">
-                                    Todolivo continúa desarrollando el proyecto Prolive en colaboración con la Universidad de Córdoba. Este proyecto se centra en soluciones digitales y biotecnológicas, así como en la mejora genética del olivo para enfrentar el cambio climático.
+                                    Todolivo continúa desarrollando el proyecto Prolive en colaboración con la Universidad de Córdoba. Este proyecto se centra en soluciones digitales y biotecnológicas, así como en la mejora genética del olivo...
                                 </p>
                             </div>
                             <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
@@ -871,7 +868,7 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">La UCO se alía con el Barcelona Supercomputing Center</h3>
                                 <p class="text-text-dark/80 text-sm line-clamp-4">
-                                    En el marco del proyecto PROLIVE, la UCO se alía con el BSC para secuenciar el genoma de todas las variedades del Banco de Germoplasma Mundial de Olivo, sentando las bases para la selección genómica de nuevas variedades.
+                                    En el marco del proyecto PROLIVE, la UCO se ha aliado con el (BSC) para secuenciar el genoma de todas las variedades del Banco de Germoplasma Mundial de Olivo de la UCO...
                                 </p>
                             </div>
                             <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
@@ -896,7 +893,7 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Lanzamiento oficial del Proyecto PROLIVE</h3>
                                 <p class="text-text-dark/80 text-sm line-clamp-4">
-                                    Se profundiza en el objetivo del proyecto PROLIVE de adaptar el cultivo del olivar al cambio climático a través de la innovación científica y tecnológica. Es una collaboration público-privada con 11 socios y un presupuesto de más de 6,4 millones.
+                                    Se profundiza en el objetivo del proyecto PROLIVE de adaptar el cultivo del olivar al cambio climático a través de la innovación científica y tecnológica. Es una colaboración público-privada con 11 socios...
                                 </p>
                             </div>
                             <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
@@ -921,7 +918,7 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Diario del Campo: Nace el proyecto PROLIVE</h3>
                                 <p class="text-text-dark/80 text-sm line-clamp-4">
-                                    Se anuncia el nacimiento del proyecto PROLIVE, que busca desarrollar soluciones digitales y biotecnológicas para mitigar la crisis del cambio climático. Liderado por el grupo Ucolivo de la UCO y Todolivo, cuenta con 11 socios.
+                                    Se anuncia el nacimiento del proyecto PROLIVE, que busca desarrollar soluciones digitales y biotecnológicas para mitigar la crisis del cambio climático y acelerar el proceso de mejora genética...
                                 </p>
                             </div>
                             <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
@@ -946,7 +943,7 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">UCO - Innovación al servicio de la mejora genética del olivar</h3>
                                 <p class="text-text-dark/80 text-sm line-clamp-4">
-                                    El proyecto PROLIVE, liderado por el grupo Ucolivo de la UCO y la empresa Todolivo, fue lanzado con el objetivo de adaptar el olivar a los desafíos del cambio climático, incluyendo la secuenciación genómica del Banco de Germoplasma.
+                                    El proyecto PROLIVE, liderado por el grupo Ucolivo de la UCO y la empresa Todolivo, fue lanzado con el objetivo de adaptar el olivar a los desafíos del cambio climático...
                                 </p>
                             </div>
                             <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
@@ -956,6 +953,81 @@
                     </a>
 
                     <!-- Noticia 6 -->
+                    <a href="https://www.diariocordoba.com/agricultura-medio-ambiente/2024/03/04/proyecto-prolive-estudia-mejora-genetica-99014012.html" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        4 de marzo de 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="newspaper" class="w-4 h-4 mr-1.5"></i>
+                                        Diario Córdoba
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Diario Córdoba: Proyecto Prolive estudia la mejora genética</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    El proyecto Prolive, liderado por el grupo Ucolivo de la Universidad de Córdoba y la empresa Todolivo, investiga la mejora genética del olivar para su adaptación al cambio climático...
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+                    
+                    <!-- Noticia 7 -->
+                    <a href="https://cuadernoagrario.com/?p=55187" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        4 de marzo de 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="newspaper" class="w-4 h-4 mr-1.5"></i>
+                                        Cuaderno Agrario
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Cuaderno Agrario: PROLIVE e innovación</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    Se destaca el liderazgo del grupo Ucolivo (UCO) y Todolivo, el presupuesto de 6,4 millones de euros y los 11 socios involucrados. El proyecto se centra en soluciones digitales y biotecnológicas...
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 8 -->
+                    <a href="https://www.eldiadecordoba.es/cordoba/Prolive-mejora-genetica-olivar-cambio-climatico_0_1881412233.html" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        Marzo 2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="newspaper" class="w-4 h-4 mr-1.5"></i>
+                                        El Día de Córdoba
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">El Día de Córdoba: Prolive y la mejora genética del olivar</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    La iniciativa PROLIVE, liderada por el grupo Ucolivo de la Universidad de Córdoba y la empresa Todolivo, cuenta con un presupuesto de 6,4 millones de euros y 11 socios...
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 9 -->
                     <a href="https://www.todolivo.com/arranca-prolive/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                         <div class="p-6 flex flex-col justify-between flex-grow">
                             <div>
@@ -971,7 +1043,82 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Todolivo: Arranca PROLIVE</h3>
                                 <p class="text-text-dark/80 text-sm line-clamp-4">
-                                    PROLIVE es un gran proyecto de innovación de 6,4 millones de euros, liderado por la UCO y Todolivo. Su objetivo principal es desarrollar soluciones digitales y biotecnológicas para la mejora genética del olivo.
+                                    PROLIVE es un gran proyecto de innovación de 6,4 millones de euros, liderado por la Universidad de Córdoba y Todolivo, aprobado por el CDTI y la AEI. Su objetivo principal es...
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 10 -->
+                    <a href="https://plantascontinental.com/prolive/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        2024-2027
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="building" class="w-4 h-4 mr-1.5"></i>
+                                        Plantas Continental
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Plantas Continental: Participación en PROLIVE</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    Plantas Continental confirma su participación en el proyecto PROLIVE, que busca implementar soluciones innovadoras basadas en biotecnología y tecnologías digitales...
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 11 -->
+                    <a href="https://www.indlab.es/participamos-en-el-proyecto-prolive/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        2024-2027
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="building" class="w-4 h-4 mr-1.5"></i>
+                                        Indlab
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Indlab: Participamos en el proyecto Prolive</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    Indlab confirma su participación en el proyecto PROLIVE, enfocado en soluciones digitales y biotecnológicas para la sostenibilidad del olivar, la mitigación del cambio climático...
+                                </p>
+                            </div>
+                            <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
+                                Leer más <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Noticia 12 -->
+                    <a href="https://agrophenolab.csic.es/project/prolive/" target="_blank" rel="noopener noreferrer" class="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between text-sm text-text-dark/70 mb-3">
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i>
+                                        2024
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="school-2" class="w-4 h-4 mr-1.5"></i>
+                                        Agrophenolab CSIC
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-text-dark mb-3 leading-snug">Agrophenolab CSIC: PROLIVE</h3>
+                                <p class="text-text-dark/80 text-sm line-clamp-4">
+                                    El proyecto tiene como meta convertir la colección de olivos de la Universidad de Córdoba en la más estudiada a nivel mundial y promover su inclusión como banco de la FAO...
                                 </p>
                             </div>
                             <span class="mt-6 text-primary-dark font-semibold text-sm flex items-center">
@@ -1271,6 +1418,7 @@
                 const entry = entries[0];
                 if (entry.isIntersecting && !hasAnimatedCounters) {
                     countersData.forEach(animateCounter);
+
                     hasAnimatedCounters = true; // Solo animar una vez
                     // No descomentar la siguiente línea si quieres que se re-anime cada vez que entras
                     // counterObserver.unobserve(impactSection); 
