@@ -150,9 +150,9 @@
 </head>
 <body class="bg-bg-light text-text-dark antialiased">
 
-    <!-- =========== HEADER / NAVEGACIÓN (MODIFICADO: FIXED) =========== -->
+    <!-- =========== HEADER / NAVEGACIÓN (MODIFICADO: FIXED Y BOTÓN MÓVIL CENTRADO) =========== -->
     <header id="header" class="bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm h-16">
-        <nav class="container mx-auto max-w-7xl px-4 py-3 flex justify-between items-center h-full">
+        <nav class="container mx-auto max-w-7xl px-4 py-3 flex justify-between items-center h-full relative">
             <!-- Logo -->
             <a href="#inicio" class="flex items-center">
                 <!-- REEMPLAZAR IMAGEN: Logo del proyecto -->
@@ -172,8 +172,8 @@
                 </a>
             </div>
 
-            <!-- Botón Menú Móvil -->
-            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-text-dark hover:bg-gray-100">
+            <!-- Botón Menú Móvil (Centrado con 'absolute') -->
+            <button id="mobile-menu-button" class="md:hidden absolute left-1/2 -translate-x-1/2 p-2 rounded-md text-text-dark hover:bg-gray-100">
                 <i data-lucide="menu"></i>
             </button>
         </nav>
@@ -1374,7 +1374,7 @@
                 });
             }
 
-            // --- Lógica de Contadores (Impacto) - CORREGIDA ---
+            // --- Lógica de Contadores (Impacto) - MODIFICADA ---
             const countersData = [
                 { id: 'count-budget', end: 6.4, decimals: 1, suffix: ' M€' },
                 { id: 'count-partners', end: 11, decimals: 0, suffix: '+' },
@@ -1384,6 +1384,7 @@
             
             const speed = 200; // Velocidad de la animación
 
+            // Función de animación
             const animateCounter = (counter) => {
                 const targetEl = document.getElementById(counter.id);
                 if (!targetEl) return;
@@ -1414,17 +1415,12 @@
             const impactSection = document.getElementById('impacto');
             let hasAnimatedCounters = false;
             
+            // Observador para animar al hacer scroll
             const counterObserver = new IntersectionObserver((entries) => {
                 const entry = entries[0];
                 if (entry.isIntersecting && !hasAnimatedCounters) {
                     countersData.forEach(animateCounter);
-
-                    hasAnimatedCounters = true; // Solo animar una vez
-                    // No descomentar la siguiente línea si quieres que se re-anime cada vez que entras
-                    // counterObserver.unobserve(impactSection); 
-                } else if (!entry.isIntersecting) {
-                    // Opcional: Resetear la animación si la sección sale de la vista
-                    // hasAnimatedCounters = false;
+                    hasAnimatedCounters = true;
                 }
             }, { threshold: 0.5 }); // Se activa al 50% de visibilidad
 
@@ -1460,7 +1456,7 @@
             }
 
 
-            // --- Lógica de Navegación Activa (Scrollspy) - CORREGIDA ---
+            // --- Lógica de Navegación Activa (Scrollspy) - MODIFICADA ---
             const sections = document.querySelectorAll('.section-spy');
             const header = document.getElementById('header');
             const allNavLinks = document.querySelectorAll('.nav-link, .nav-button');
@@ -1512,6 +1508,11 @@
                     // Cierra el menú móvil si está abierto
                     if (mobileMenuEl && !mobileMenuEl.classList.contains('hidden')) {
                         mobileMenuEl.classList.add('hidden');
+                    }
+
+                    // MODIFICACIÓN: Si se hace clic en "Impacto", reiniciar la animación
+                    if (id === 'impacto') {
+                        countersData.forEach(animateCounter);
                     }
                 });
             });
