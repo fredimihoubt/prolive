@@ -272,51 +272,51 @@
         <section id="impacto" class="py-24 bg-white section-spy">
             <div class="container mx-auto max-w-7xl px-4">
                 
-                <!-- Contadores Animados -->
+                <!-- Contadores (MODIFICADO: Números fijos y efectos hover) -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mb-16">
                     <!-- Dato 1: Presupuesto -->
-                    <div class="flex flex-col items-center justify-start p-4">
+                    <div class="flex flex-col items-center justify-start p-4 rounded-lg transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-white">
                         <i data-lucide="euro" class="w-12 h-12 text-primary-light mb-3"></i>
-                        <span id="count-budget" class="impact-number">0.0 M€</span>
+                        <span id="count-budget" class="impact-number">6.4 M€</span>
                         <span class="impact-label">Presupuesto</span>
                     </div>
                     <!-- Dato 2: Socios -->
-                    <div class="flex flex-col items-center justify-start p-4">
+                    <div class="flex flex-col items-center justify-start p-4 rounded-lg transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-white">
                         <i data-lucide="users" class="w-12 h-12 text-primary-light mb-3"></i>
-                        <span id="count-partners" class="impact-number">0+</span>
+                        <span id="count-partners" class="impact-number">11+</span>
                         <span class="impact-label">Socios (Público-Privado)</span>
                     </div>
                     <!-- Dato 3: Actividades -->
-                    <div class="flex flex-col items-center justify-start p-4">
+                    <div class="flex flex-col items-center justify-start p-4 rounded-lg transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-white">
                         <i data-lucide="clipboard-list" class="w-12 h-12 text-primary-light mb-3"></i>
-                        <span id="count-activities" class="impact-number">0</span>
+                        <span id="count-activities" class="impact-number">5</span>
                         <span class="impact-label">Actividades Principales</span>
                     </div>
                     <!-- Dato 4: Duración -->
-                    <div class="flex flex-col items-center justify-start p-4">
+                    <div class="flex flex-col items-center justify-start p-4 rounded-lg transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-white">
                         <i data-lucide="calendar-days" class="w-12 h-12 text-primary-light mb-3"></i>
-                        <span id="count-duration" class="impact-number">0</span>
+                        <span id="count-duration" class="impact-number">48</span>
                         <span class="impact-label">Meses de Duración</span>
                     </div>
                 </div>
 
-                <!-- Slogan y Resultados Destacados -->
+                <!-- Slogan y Resultados Destacados (MODIFICADO: efectos hover) -->
                 <div class="text-center mb-16">
                     <p class="text-2xl italic text-primary-dark max-w-4xl mx-auto mb-12">
                         "Un proyecto estratégico para revolucionar la olivicultura mediante la digitalización y la biotecnología."
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left">
+                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1">
                             <i data-lucide="database" class="w-10 h-10 text-primary-dark mb-3"></i>
                             <h4 class="font-semibold text-lg text-text-dark">Lanzamiento de OliveMine</h4>
                             <p class="text-text-dark/80 text-sm">Base de datos integrativa para gestionar información genómica y fenómica.</p>
                         </div>
-                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left">
+                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1">
                             <i data-lucide="area-chart" class="w-10 h-10 text-primary-dark mb-3"></i>
                             <h4 class="font-semibold text-lg text-text-dark">Alta Correlación Digital</h4>
                             <p class="text-text-dark/80 text-sm">Demostrada alta correlación (<i>R<sup>2</sup>&gt;0,8</i>) entre métodos digitales y mediciones tradicionales.</p>
                         </div>
-                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left">
+                        <div class="bg-bg-light p-6 rounded-lg shadow-sm border-l-4 border-primary-light text-left transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1">
                             <i data-lucide="binary" class="w-10 h-10 text-primary-dark mb-3"></i>
                             <h4 class="font-semibold text-lg text-text-dark">Prototipo ODT Funcional</h4>
                             <p class="text-text-dark/80 text-sm">Desarrollo de un prototipo de Gemelo Digital (ODT) capaz de simular escenarios.</p>
@@ -1199,6 +1199,11 @@
 
     </main>
 
+    <!-- =========== Botón Go Up (AÑADIDO) =========== -->
+    <a href="#inicio" id="go-up-button" class="fixed bottom-6 right-6 z-40 p-3 bg-primary-dark text-white rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-primary-light hover:scale-110">
+        <i data-lucide="chevron-up" class="w-6 h-6"></i>
+    </a>
+
     <!-- =========== FOOTER =========== -->
     <footer class="bg-text-dark text-text-light/70 py-16">
         <div class="container mx-auto max-w-7xl px-4">
@@ -1374,59 +1379,6 @@
                 });
             }
 
-            // --- Lógica de Contadores (Impacto) - MODIFICADA ---
-            const countersData = [
-                { id: 'count-budget', end: 6.4, decimals: 1, suffix: ' M€' },
-                { id: 'count-partners', end: 11, decimals: 0, suffix: '+' },
-                { id: 'count-activities', end: 5, decimals: 0, suffix: '' },
-                { id: 'count-duration', end: 48, decimals: 0, suffix: '' }
-            ];
-            
-            const speed = 200; // Velocidad de la animación
-
-            // Función de animación
-            const animateCounter = (counter) => {
-                const targetEl = document.getElementById(counter.id);
-                if (!targetEl) return;
-
-                const end = counter.end;
-                const decimals = counter.decimals;
-                const suffix = counter.suffix || '';
-                let current = 0; // Iniciar siempre desde 0
-                
-                const increment = end / speed;
-
-                const updateCount = () => {
-                    if (current < end) {
-                        current += increment;
-                        if (current > end) current = end;
-                        targetEl.innerText = current.toFixed(decimals) + suffix;
-                        requestAnimationFrame(updateCount);
-                    } else {
-                        targetEl.innerText = end.toFixed(decimals) + suffix;
-                    }
-                };
-                
-                // Reiniciar el texto a 0 antes de animar
-                targetEl.innerText = (0).toFixed(decimals) + suffix;
-                updateCount();
-            };
-
-            const impactSection = document.getElementById('impacto');
-            let hasAnimatedCounters = false;
-            
-            // Observador para animar al hacer scroll
-            const counterObserver = new IntersectionObserver((entries) => {
-                const entry = entries[0];
-                if (entry.isIntersecting && !hasAnimatedCounters) {
-                    countersData.forEach(animateCounter);
-                    hasAnimatedCounters = true;
-                }
-            }, { threshold: 0.5 }); // Se activa al 50% de visibilidad
-
-            if (impactSection) {
-                counterObserver.observe(impactSection);
-            }
 
             // --- Lógica de la Barra de Progreso (Impacto) ---
             const startDate = new Date('2024-01-01');
@@ -1509,13 +1461,24 @@
                     if (mobileMenuEl && !mobileMenuEl.classList.contains('hidden')) {
                         mobileMenuEl.classList.add('hidden');
                     }
-
-                    // MODIFICACIÓN: Si se hace clic en "Impacto", reiniciar la animación
-                    if (id === 'impacto') {
-                        countersData.forEach(animateCounter);
-                    }
                 });
             });
+
+            // --- Lógica del Botón Go Up (AÑADIDO) ---
+            const goUpButton = document.getElementById('go-up-button');
+            if (goUpButton) {
+                window.addEventListener('scroll', () => {
+                    // Mostrar después de 400px de scroll
+                    if (window.scrollY > 400) { 
+                        goUpButton.classList.remove('opacity-0', 'invisible');
+                        goUpButton.classList.add('opacity-100', 'visible');
+                    } else {
+                        goUpButton.classList.remove('opacity-100', 'visible');
+                        goUpButton.classList.add('opacity-0', 'invisible');
+                    }
+                });
+                // El clic es manejado por href="#inicio" y scroll-smooth de <html>
+            }
 
         });
     </script>
